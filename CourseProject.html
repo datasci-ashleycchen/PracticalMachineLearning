@@ -221,7 +221,7 @@ library(caret)
 
 <pre><code class="r">training = read.csv(&quot;CourseProject/training.csv&quot;, na.string = c(&quot;NA&quot;, &quot;&quot;, &quot; &quot;), 
     as.is = TRUE)
-testing = read.csv(&quot;CourseProject/training.csv&quot;, na.string = c(&quot;NA&quot;, &quot;&quot;, &quot; &quot;), 
+testing = read.csv(&quot;CourseProject/testing.csv&quot;, na.string = c(&quot;NA&quot;, &quot;&quot;, &quot; &quot;), 
     as.is = TRUE)
 </code></pre>
 
@@ -239,7 +239,6 @@ clean_training = clean_training[, 8:length(names(clean_training))]
 clean_testing = clean_testing[, 8:length(names(clean_testing))]
 
 clean_training$classe = as.factor(clean_training$classe)
-clean_testing$classe = as.factor(clean_testing$classe)
 </code></pre>
 
 <h3>Data Analysis:</h3>
@@ -338,50 +337,26 @@ confusionMatrix(pred_cv, final_validation$classe)
 
 <p>Still looking great! Cross-validation accuracy is at 99.429%.</p>
 
-<p>Lastly, let&#39;s try this model on a separate testing dataset to see how it performs out-of sample.</p>
-
-<pre><code class="r">pred_testing = predict(fit_rf, newdata = clean_testing)
-confusionMatrix(pred_testing, clean_testing$classe)
-</code></pre>
-
-<pre><code>## Confusion Matrix and Statistics
-## 
-##           Reference
-## Prediction    A    B    C    D    E
-##          A 5579    6    0    0    0
-##          B    1 3786    2    0    0
-##          C    0    5 3418    7    1
-##          D    0    0    2 3209    4
-##          E    0    0    0    0 3602
-## 
-## Overall Statistics
-##                                         
-##                Accuracy : 0.999         
-##                  95% CI : (0.998, 0.999)
-##     No Information Rate : 0.284         
-##     P-Value [Acc &gt; NIR] : &lt;2e-16        
-##                                         
-##                   Kappa : 0.998         
-##  Mcnemar&#39;s Test P-Value : NA            
-## 
-## Statistics by Class:
-## 
-##                      Class: A Class: B Class: C Class: D Class: E
-## Sensitivity             1.000    0.997    0.999    0.998    0.999
-## Specificity             1.000    1.000    0.999    1.000    1.000
-## Pos Pred Value          0.999    0.999    0.996    0.998    1.000
-## Neg Pred Value          1.000    0.999    1.000    1.000    1.000
-## Prevalence              0.284    0.194    0.174    0.164    0.184
-## Detection Rate          0.284    0.193    0.174    0.164    0.184
-## Detection Prevalence    0.285    0.193    0.175    0.164    0.184
-## Balanced Accuracy       1.000    0.998    0.999    0.999    0.999
-</code></pre>
-
-<p>Super! We achieved an accuracy of 99.8573%, even on a out-of-sample dataset. </p>
-
 <h3>Conclusion:</h3>
 
 <p>We were able to predict activities from measurement highly accurately with the random forest machine learning algorithm. </p>
+
+<h3>Project Part II: Making predictions about a separate testing datset</h3>
+
+<pre><code class="r">pred_testing = predict(fit_rf, newdata = clean_testing)
+
+
+pml_write_files = function(x) {
+    n = length(x)
+    for (i in 1:n) {
+        filename = paste0(&quot;problem_id_&quot;, i, &quot;.txt&quot;)
+        write.table(x[i], file = filename, quote = FALSE, row.names = FALSE, 
+            col.names = FALSE)
+    }
+}
+
+pml_write_files(pred_testing)
+</code></pre>
 
 </body>
 

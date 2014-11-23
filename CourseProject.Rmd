@@ -29,7 +29,7 @@ if (!file.exists("CourseProject")){
 Next, let's load the data into R.
 ```{r load data}
 training = read.csv("CourseProject/training.csv", na.string=c("NA",""," "), as.is=TRUE)
-testing = read.csv("CourseProject/training.csv", na.string=c("NA",""," "), as.is=TRUE)
+testing = read.csv("CourseProject/testing.csv", na.string=c("NA",""," "), as.is=TRUE)
 ```
 
 Next, let's clean up the data & do some feature selection. In order to make sensible prediction of the outcome variable "classe", we 1) removed columns with NAs and 2) removed "metadata" that seemed to carry information about the data (e.g. user_name, timestamp etc), but w/o much sensible prediction power.
@@ -44,7 +44,6 @@ clean_training = clean_training[,8:length(names(clean_training))]
 clean_testing = clean_testing[,8:length(names(clean_testing))]
 
 clean_training$classe = as.factor(clean_training$classe)
-clean_testing$classe = as.factor(clean_testing$classe)
 ```
 
 ### Data Analysis:
@@ -73,13 +72,23 @@ confusionMatrix(pred_cv, final_validation$classe)
 ```
 Still looking great! Cross-validation accuracy is at `r confusionMatrix(pred_cv, final_validation$classe)$overall[1]*100`%.
 
-Lastly, let's try this model on a separate testing dataset to see how it performs out-of sample.
-```{r run testing}
-pred_testing = predict(fit_rf, newdata=clean_testing)
-confusionMatrix(pred_testing, clean_testing$classe)
-```
-Super! We achieved an accuracy of `r confusionMatrix(pred_testing, clean_testing$classe)$overall[1]*100`%, even on a out-of-sample dataset. 
-
 ### Conclusion:
 We were able to predict activities from measurement highly accurately with the random forest machine learning algorithm. 
+
+### Project Part II: Making predictions about a separate testing datset
+```{r run testing}
+pred_testing = predict(fit_rf, newdata=clean_testing)
+
+
+pml_write_files = function(x){
+  n = length(x)
+  for(i in 1:n){
+    filename = paste0("problem_id_",i,".txt")
+    write.table(x[i],file=filename,quote=FALSE,row.names=FALSE,col.names=FALSE)
+  }
+}
+
+pml_write_files(pred_testing)
+```
+
 
